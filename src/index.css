@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #60241e;
+  --color-brand: #95271d;
+  --color-rose: #b34a44;
+  --color-ember: #e77b49;
+  --color-cream: #fff8f3;
+  --color-sand: #f7ebe3;
+  --color-line: #ead7cb;
+  --color-muted: #7a5a52;
+  --color-ink-950: #3a1410;
+  --color-success: #3f7d58;
+  --color-success-bg: #e6f2ea;
+
+  --font-sans: "Plus Jakarta Sans Variable", "Cairo Variable", system-ui, sans-serif;
+  --font-arabic: "Cairo Variable", "Plus Jakarta Sans Variable", system-ui, sans-serif;
+  --font-wordmark: "Reem Kufi", "Cairo Variable", serif;
+
+  --shadow-soft: 0 1px 2px rgba(96, 36, 30, 0.06), 0 6px 18px rgba(96, 36, 30, 0.08);
+  --shadow-lift: 0 2px 4px rgba(96, 36, 30, 0.08), 0 18px 40px rgba(96, 36, 30, 0.16);
+
+  --ease-luqta: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-scan: scan 2.4s var(--ease-luqta) infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 1.8s ease-in-out infinite;
+
+  @keyframes scan {
+    0% { top: 6%; opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { top: 94%; opacity: 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+  }
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-drift: drift 16s ease-in-out infinite;
+  --animate-drift-slow: drift 24s ease-in-out infinite reverse;
+  --animate-sheen: sheen 3.2s var(--ease-luqta) infinite;
+  --animate-ring: ring 2.4s var(--ease-luqta) infinite;
+  --animate-bob: bob 3.6s ease-in-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(40px, -30px, 0) scale(1.12); }
+  }
+  @keyframes sheen {
+    0% { transform: translateX(-120%) skewX(-18deg); }
+    55%, 100% { transform: translateX(260%) skewX(-18deg); }
+  }
+  @keyframes ring {
+    0% { box-shadow: 0 0 0 0 rgb(231 123 73 / 0.55); }
+    80%, 100% { box-shadow: 0 0 0 14px rgb(231 123 73 / 0); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+  :lang(ar) {
+    font-family: var(--font-arabic);
+  }
+  ::selection {
+    background: rgb(231 123 73 / 0.35);
+    color: var(--color-ink-950);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-ember);
+    outline-offset: 2px;
+  }
+  button, [role="button"], a, select, summary {
+    touch-action: manipulation;
+  }
+  img { max-width: 100%; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgb(255 248 243 / 0.78);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    backdrop-filter: blur(14px) saturate(1.3);
+  }
+  .font-wordmark { font-family: var(--font-wordmark); }
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  /* soft glow behind the whole app so cream pages never feel flat */
+  .app-bg {
+    background:
+      radial-gradient(60rem 36rem at 8% -6%, rgb(231 123 73 / 0.13), transparent 60%),
+      radial-gradient(50rem 34rem at 100% 12%, rgb(179 74 68 / 0.10), transparent 60%),
+      radial-gradient(46rem 30rem at 40% 105%, rgb(149 39 29 / 0.07), transparent 60%),
+      var(--color-cream);
+  }
+  /* diagonal light sweep for buttons: add to a relatively positioned, overflow-hidden parent named .shine */
+  .shine { position: relative; overflow: hidden; isolation: isolate; }
+  .shine::before {
+    content: "";
+    position: absolute; inset: 0 auto 0 0; width: 38%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.38), transparent);
+    transform: translateX(-120%) skewX(-18deg);
+    pointer-events: none; z-index: -1;
+  }
+  .shine:hover::before { animation: sheen 0.9s var(--ease-luqta) 1; }
+  .text-gradient {
+    background: linear-gradient(95deg, var(--color-ember), #f6a46f 45%, var(--color-ember));
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: gradient-pan 6s linear infinite;
+  }
+  @keyframes gradient-pan { to { background-position: 200% center; } }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+/* Camera viewfinder corner brackets: the brand motif. Use sparingly. */
+.viewfinder { position: relative; }
+.viewfinder::after {
+  transition: inset 0.4s var(--ease-luqta);
+  content: "";
+  position: absolute;
+  inset: var(--vf-inset, 10px);
+  pointer-events: none;
+  --c: var(--vf-color, var(--color-brand));
+  --t: var(--vf-thick, 3px);
+  --l: var(--vf-len, 22px);
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) var(--t),
+    linear-gradient(var(--c), var(--c)) top left / var(--t) var(--l),
+    linear-gradient(var(--c), var(--c)) top right / var(--l) var(--t),
+    linear-gradient(var(--c), var(--c)) top right / var(--t) var(--l),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) var(--t),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--t) var(--l),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--t),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--t) var(--l);
+  background-repeat: no-repeat;
+}
+
+/* Leaflet needs these to sit under our dialogs */
+.leaflet-container { font-family: var(--font-sans); z-index: 0; }
