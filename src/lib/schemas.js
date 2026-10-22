@@ -83,3 +83,13 @@ export function lostDetailsIssues({ photo, category, description }) {
   }
   return issues;
 }
+
+// ---------- password rules for creating an account (sign-in does not enforce these) ----------
+export const PASSWORD_RULES = [
+  { id: "length", label: "At least 8 characters", test: (v) => v.length >= 8 },
+  { id: "letter", label: "A letter", test: (v) => /[A-Za-z]/.test(v) },
+  { id: "number", label: "A number", test: (v) => /\d/.test(v) },
+  { id: "special", label: "A special character (like ! @ # $ %)", test: (v) => /[^A-Za-z0-9\s]/.test(v) },
+];
+
+export const passwordProblems = (value = "") => PASSWORD_RULES.filter((r) => !r.test(value));

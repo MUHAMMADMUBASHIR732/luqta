@@ -1,5 +1,5 @@
-import { cloneElement, forwardRef, useId } from "react";
-import { ChevronDown, CircleAlert } from "lucide-react";
+import { cloneElement, forwardRef, useId, useState } from "react";
+import { ChevronDown, CircleAlert, Eye, EyeOff } from "lucide-react";
 import { cn } from "../lib/cn.js";
 
 const control =
@@ -9,6 +9,25 @@ const control =
 
 export const Input = forwardRef(function Input({ className, ...rest }, ref) {
   return <input ref={ref} className={cn(control, "min-h-12", className)} {...rest} />;
+});
+
+/** Password box with an eye button to show or hide what was typed. */
+export const PasswordInput = forwardRef(function PasswordInput({ className, ...rest }, ref) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <input ref={ref} type={visible ? "text" : "password"} className={cn(control, "min-h-12 pe-12", className)} {...rest} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        className="absolute end-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-muted transition-colors hover:bg-sand hover:text-ink"
+      >
+        {visible ? <EyeOff className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" /> : <Eye className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />}
+      </button>
+    </div>
+  );
 });
 
 export const Textarea = forwardRef(function Textarea({ className, ...rest }, ref) {
