@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
-import { ChevronDown, LogOut, Menu, Repeat, UserRound, X } from "lucide-react";
+import { ChevronDown, LogOut, Repeat, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "../lib/cn.js";
 import { initials } from "../lib/format.js";
@@ -18,10 +18,16 @@ const LINKS = [
   { to: "/my-reports", label: "My reports" },
 ];
 
-const linkClass = ({ isActive }) =>
+const linkClass = (onHome) => ({ isActive }) =>
   cn(
-    "relative inline-flex min-h-11 items-center rounded-full px-4 text-[0.95rem] font-semibold transition-colors duration-200",
-    isActive ? "bg-ink text-cream shadow-soft" : "text-ink hover:bg-sand hover:text-brand"
+    "relative inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-[0.95rem] font-semibold transition-colors duration-200",
+    onHome
+      ? isActive
+        ? "bg-ember text-ink-950 shadow-soft"
+        : "text-cream/90 hover:bg-white/10 hover:text-white"
+      : isActive
+        ? "bg-ink text-cream shadow-soft"
+        : "text-ink hover:bg-sand hover:text-brand"
   );
 
 export default function Navbar() {
@@ -29,7 +35,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menu, setMenu] = useState(false);
-  const [mobile, setMobile] = useState(false);
   const menuRef = useRef(null);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.4 });
@@ -39,14 +44,12 @@ export default function Navbar() {
 
   async function leave() {
     setMenu(false);
-    setMobile(false);
     await signOut();
     navigate("/");
   }
 
   async function swap(email) {
     setMenu(false);
-    setMobile(false);
     try {
       const next = await switchDemoUser(email);
       toast.success(`Now using the app as ${next.name}`);
@@ -66,9 +69,9 @@ export default function Navbar() {
         </Link>
 
         {user && (
-          <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
             {LINKS.map((l) => (
-              <NavLink key={l.to} to={l.to} className={linkClass}>
+              <NavLink key={l.to} to={l.to} className={linkClass(onHome)}>
                 {l.label}
               </NavLink>
             ))}
@@ -81,7 +84,7 @@ export default function Navbar() {
               <div className={onHome ? "text-cream [&_button:hover]:bg-white/10 [&_button]:text-cream" : ""}>
                 <NotificationBell />
               </div>
-              <div ref={menuRef} className="relative hidden md:block">
+              <div ref={menuRef} className="relative hidden lg:block">
                 <button
                   type="button"
                   onClick={() => setMenu((o) => !o)}
@@ -122,15 +125,6 @@ export default function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
-              <button
-                type="button"
-                onClick={() => setMobile((o) => !o)}
-                aria-label={mobile ? "Close menu" : "Open menu"}
-                aria-expanded={mobile}
-                className={cn("grid h-11 w-11 place-items-center rounded-full md:hidden", onHome ? "text-cream hover:bg-white/10" : "text-ink hover:bg-sand")}
-              >
-                {mobile ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
-              </button>
             </>
           ) : (
             <Button to="/login" size="sm" variant={onHome ? "accent" : "primary"}>
@@ -145,38 +139,6 @@ export default function Navbar() {
         style={{ scaleX: progress }}
         className="absolute inset-x-0 bottom-[-1px] h-[3px] origin-left bg-gradient-to-r from-brand via-rose to-ember"
       />
-      <AnimatePresence>
-        {user && mobile && (
-          <motion.nav
-            aria-label="Menu"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: DUR.ui, ease: EASE }}
-            className="overflow-hidden border-t border-line bg-cream md:hidden"
-          >
-            <div className="flex flex-col gap-1 p-3">
-              {LINKS.map((l) => (
-                <NavLink key={l.to} to={l.to} onClick={() => setMobile(false)} className={({ isActive }) => cn(linkClass({ isActive }), "text-base")}>
-                  {l.label}
-                </NavLink>
-              ))}
-              <NavLink to="/profile" onClick={() => setMobile(false)} className={({ isActive }) => cn(linkClass({ isActive }), "text-base")}>
-                Profile
-              </NavLink>
-              {isMock &&
-                others.map((a) => (
-                  <button key={a.email} type="button" onClick={() => swap(a.email)} className="min-h-11 rounded-full px-4 text-start text-base font-semibold text-ink hover:bg-sand">
-                    Switch to {a.name} (demo)
-                  </button>
-                ))}
-              <button type="button" onClick={leave} className="min-h-11 rounded-full px-4 text-start text-base font-semibold text-brand hover:bg-sand">
-                Sign out
-              </button>
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
     </header>
   );
 }
